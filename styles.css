@@ -1,0 +1,55 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-image: url("./Images/background.jpg");
+    background-size: cover; /* Cambiado a cover para que ocupe todo el espacio */
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    background-image: url("./Images/headerbg.avif");
+}
+
+.header h1 {
+    margin-bottom: 10px;
+    font-size: 2.6rem;
+    text-shadow: 1px 1px 1px #9b9898;
+}
+
+.container-donations {
+    flex: 1; /* Permite que el contenedor tome todo el espacio disponible */
+    overflow-y: auto; /* Agrega scroll si el contenido excede la altura */
+    height: 45%;
+}
+
+.card {
+    transition: transform 0.2s;
+    cursor: pointer; /* Cambia el cursor al pasar sobre la tarjeta */
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card-body {
+    transition: opacity 0.2s; /* Transición suave */
+}
+
+.card-footer {
+    display: none; /* Oculta por defecto */
+}
+
+.card:hover .card-footer {
+    display: block; /* Muestra el footer */
+}
+
+.card:hover .card-body {
+    opacity: 0; /* Usa opacidad en lugar de ocultar para una mejor transición */
+}

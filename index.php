@@ -63,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </div>
             <div class="text-center mt-4">
                 <button type="submit" class="btn btn-primary mr-2 w-75">Iniciar</button>
-                <a href="userRegistration.html" class="btn btn-outline-primary w-75 mt-4">Registrarme</a>
+                <a href="./Aplicacacion/Controllers/userRegistration.php" class="btn btn-outline-primary w-75 mt-4">Registrarme</a>
             </div>
         </form>
     </div>

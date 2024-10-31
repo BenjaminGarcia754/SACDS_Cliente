@@ -1,0 +1,58 @@
+<?php
+
+class DonadorSingleton
+{
+    private static $instance = null;
+
+    private int $id;
+    private string $nombre;
+    private string $apellidoPaterno;
+    private string $apellidoMaterno;
+    private string $correo;
+    private string $telefono;
+    private string $direccion;
+    private string $contrasena;
+    private string $grupoSanguineo;
+
+    private function __construct() {
+        // Constructor privado para el patrón Singleton
+    }
+
+    public static function getInstance(): DonadorSingleton {
+        if (self::$instance === null) {
+            self::$instance = new DonadorSingleton();
+        }
+        return self::$instance;
+    }
+
+    public function fromDonador(Donador $donador): void {
+        $this->id = $donador->id;
+        $this->nombre = $donador->nombre;
+        $this->apellidoPaterno = $donador->apellidoPaterno;
+        $this->apellidoMaterno = $donador->apellidoMaterno;
+        $this->correo = $donador->correo;
+        $this->telefono = $donador->telefono;
+        $this->direccion = $donador->direccion;
+        $this->contrasena = $donador->contrasena;
+        $this->grupoSanguineo = $donador->grupoSanguineo;
+    
+    }
+
+    public function toDonador(): Donador {
+
+        $donador = new Donador();
+        //TODO: Implementar paso de parametros
+        $donador->id = $this->id;
+        $donador->nombre = $this->nombre;
+        
+        return $donador;
+    }
+
+    public function isEmpty(): bool
+    {
+        return empty($this->nombre) && empty($this->correo);
+    }
+    
+}
+
+   

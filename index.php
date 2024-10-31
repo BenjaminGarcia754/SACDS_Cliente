@@ -1,10 +1,17 @@
-<?php 
+<?php
+
+use GuzzleHttp\Psr7\Message;
+
 require 'Infraestructura/DonadorAPI.php';
 require 'Modelo/Donador.php';
-require 'Modelo/Singleton/Donador.php';
+require 'Modelo/Singleton/DonadorSingleton.php';
 
 $message = ''; // Variable para almacenar el mensaje de respuesta
-
+if($_SERVER["REQUEST_METHOD"] == "GET"){
+    if(isset($_GET['idNuevaCuenta'])){
+        $message = "<div class='alert alert-success'>Se ha creado tu cuenta exitosamente.</div>";
+    }
+}
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -22,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($result['status'] === 200) {
         // Crea una instancia de Donador con los datos deserializados
         $donadorTemporal = $result['donador'];
-        //Donador::getInstance()->fromDonador($donadorTemporal);
+        DonadorSingleton::getInstance()->fromDonador($donadorTemporal);
         // Redirige a menuPrincipal.php si el inicio de sesión es exitoso
         header("Location: Aplicacacion/Controllers/Menu.php");
         exit();  // Asegura que se detiene el procesamiento después de la redirección
@@ -39,16 +46,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio de Sesión</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./Aplicacacion/Controllers/styles.css">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body>
-    <div class="header text-center py-4 bg-light rounded shadow">
+<body style="background-image: url('./Aplicacacion/Controllers/Images/background.jpg');">
+    <div style="background-image: url('./Aplicacacion/Controllers/Images/headerbg.avif');" class="header text-center py-4 bg-light rounded shadow">
         <h1 class="display-4 font-weight-bold text-primary">SISTEMA DE ADMINISTRACIÓN DE DONADORES DE SANGRE</h1>
         <h2 class="lead text-secondary">CENTRO DE ALTAS ESPECIALIDADES</h2>
     </div>
-    <div class="bg-white p-4 rounded shadow mx-auto mt-5 w-50" style="max-width: 500px;">
+    <div class="bg-white p-4 rounded shadow mx-auto mt-5 mb-5 w-50" style="max-width: 500px;">
         <h2 class="text-center">Iniciar Sesión</h2>
         <?php echo $message;?>
         <form action="index.php" method="POST">
@@ -76,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </div>
     <footer class="bg-white py-3 mt-5">
         <div class="container text-center">
-            <img src="./Images/footerImages.png" class="img-fluid" alt="Imagen 1">
+            <img src="./Aplicacacion/Controllers/Images/footerImages.png" class="img-fluid" alt="Imagen 1">
         </div>
     </footer>
     <script>

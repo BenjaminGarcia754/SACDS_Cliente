@@ -37,7 +37,7 @@ class DonadorAPI
 
     public function registrarDonador(Donador $donador){
         try {
-            $url = $this->baseUrl.'/donadores/';
+            $url = $this->baseUrl.'Donador/AddDonador';
             $response = $this->client->post( $url, ['json' => $donador]);
             return json_decode($response->getBody()->getContents());
         }catch (RequestException $e) {
@@ -95,10 +95,37 @@ class DonadorAPI
             }
         }
     }
-
-    public function actualizarDonador(Donador $donador){
+    
+    public function VerificarCorreo(string $correo)
+    {
         try {
-            $url = $this->baseUrl.'/donadores/';
+            $url = $this->baseUrl . 'Donador/VerifyCorreoExistente';
+            
+            $response = $this->client->post($url, [
+                'json' => ['correo' => $correo],
+                'verify' => false,
+            ]);
+    
+            $statusCode = $response->getStatusCode();  // Captura el código de estado
+            $data = json_decode($response->getBody()->getContents(), true);  // Decodifica el cuerpo JSON
+            if($statusCode === 200){
+                return true;
+            }else{
+                return false;
+            }
+    
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                return false;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    public function actualizarDonador($id, Donador $donador){
+        try {
+            $url = $this->baseUrl.'Donador/UpdateDonador'.$id;
             $response = $this->client->put( $url, ['json' => $donador]);
             return json_decode($response->getBody()->getContents());
         }catch (RequestException $e) {

@@ -1,6 +1,7 @@
 <?php 
 require 'Infraestructura/DonadorAPI.php';
 require 'Modelo/Donador.php';
+require 'Modelo/Singleton/Donador.php';
 
 $message = ''; // Variable para almacenar el mensaje de respuesta
 
@@ -17,9 +18,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $donadorAPI = new DonadorAPI();
     $result = $donadorAPI->IniciarSesion($donador);
 
-    // Verificar el estado de la respuesta y construir el mensaje
+    // Verificar el estado de la respuesta
     if ($result['status'] === 200) {
-        $message = "<div class='alert alert-success'>Inicio de sesión exitoso: " . $result['data']['mensaje'] . "</div>";
+        // Crea una instancia de Donador con los datos deserializados
+        $donadorTemporal = $result['donador'];
+        //Donador::getInstance()->fromDonador($donadorTemporal);
+        // Redirige a menuPrincipal.php si el inicio de sesión es exitoso
+        header("Location: Aplicacacion/Controllers/Menu.php");
+        exit();  // Asegura que se detiene el procesamiento después de la redirección
     } elseif ($result['status'] === 404) {
         $message = "<div class='alert alert-danger'>Usuario o contraseña incorrectos.</div>";
     } else {

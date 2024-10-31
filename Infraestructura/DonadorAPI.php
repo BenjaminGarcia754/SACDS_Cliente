@@ -57,11 +57,29 @@ class DonadorAPI
     
             $statusCode = $response->getStatusCode();  // Captura el código de estado
             $data = json_decode($response->getBody()->getContents(), true);  // Decodifica el cuerpo JSON
-            
-            return [
-                'status' => $statusCode,
-                'data' => $data
-            ];
+            if($statusCode === 200){
+                $donadorTemporal = new Donador();
+                $donadorTemporal->id = $data['id'];
+                $donadorTemporal->nombre = $data['nombre'];
+                $donadorTemporal->apellidoPaterno = $data['apellidoPaterno'];
+                $donadorTemporal->apellidoMaterno = $data['apellidoMaterno'];
+                $donadorTemporal->correo = $data['correo'];
+                $donadorTemporal->telefono = $data['telefono'];
+                $donadorTemporal->direccion = $data['direccion'];
+                $donadorTemporal->contrasena = $data['contrasena'];
+                $donadorTemporal->grupoSanguineo = $data['grupoSanguineo'];
+
+                return [
+                    'status' => $statusCode,
+                    'donador' => $donadorTemporal
+                ];
+
+            }else{
+                return [
+                    'status'=> $statusCode,
+                    'donador'=> null
+                ];
+            }
     
         } catch (RequestException $e) {
             if ($e->hasResponse()) {

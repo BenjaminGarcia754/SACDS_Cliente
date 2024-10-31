@@ -11,4 +11,6 @@ class Donador
     public string $direccion;
     public string $contrasena;
     public string $grupoSanguineo;
+
+    
 }

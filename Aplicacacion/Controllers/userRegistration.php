@@ -1,6 +1,7 @@
 <?php 
 require './../../Infraestructura/DonadorAPI.php';
 require './../../Modelo/Donador.php';
+use GuzzleHttp\Psr7\Message;
 
 $message = ''; // Variable para almacenar el mensaje de respuesta
 

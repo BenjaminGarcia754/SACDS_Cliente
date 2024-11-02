@@ -97,37 +97,32 @@ class DonadorAPI
     }
     
     public function VerificarCorreo(string $correo)
-    {
-        try {
-            $url = $this->baseUrl . 'Donador/VerifyCorreoExistente';
-            
-            $response = $this->client->post($url, [
-                'json' => ['correo' => $correo],
-                'verify' => false,
-            ]);
-    
-            $statusCode = $response->getStatusCode();  // Captura el código de estado
-            $data = json_decode($response->getBody()->getContents(), true);  // Decodifica el cuerpo JSON
-            if($statusCode === 200){
-                return true;
-            }else{
-                return false;
-            }
-    
-        } catch (RequestException $e) {
-            if ($e->hasResponse()) {
-                return false;
-            } else {
-                return false;
-            }
+{
+    try {
+        $url = $this->baseUrl . 'Donador/VerifyCorreoExistente?correo=' . urlencode($correo);
+
+        $response = $this->client->post($url, [
+            'verify' => false,
+        ]);
+
+        $statusCode = $response->getStatusCode();
+        $data = json_decode($response->getBody()->getContents(), true);
+        if ($statusCode === 200) {
+            return true;
+        } else {
+            return false;
         }
+
+    } catch (RequestException $e) {
+        return false;
     }
+}
 
     public function actualizarDonador($id, Donador $donador){
         try {
-            $url = $this->baseUrl.'Donador/UpdateDonador'.$id;
+            $url = $this->baseUrl.'Donador/UpdateDonador/'.$id;
             $response = $this->client->put( $url, ['json' => $donador]);
-            return json_decode($response->getBody()->getContents());
+            return $response->getStatusCode();
         }catch (RequestException $e) {
             return $e->getMessage();
         }

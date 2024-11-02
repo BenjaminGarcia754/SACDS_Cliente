@@ -1,5 +1,6 @@
 <?php
-
+session_start();
+session_unset();
 use GuzzleHttp\Psr7\Message;
 
 require 'Infraestructura/DonadorAPI.php';
@@ -29,8 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($result['status'] === 200) {
         // Crea una instancia de Donador con los datos deserializados
         $donadorTemporal = $result['donador'];
-        DonadorSingleton::getInstance()->fromDonador($donadorTemporal);
-        // Redirige a menuPrincipal.php si el inicio de sesión es exitoso
+        $_SESSION['idDonador'] = $donadorTemporal->id;
         header("Location: Aplicacacion/Controllers/Menu.php");
         exit();  // Asegura que se detiene el procesamiento después de la redirección
     } elseif ($result['status'] === 404) {

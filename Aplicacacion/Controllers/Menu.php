@@ -1,10 +1,21 @@
 <?php
-
+session_start();
+if(!isset($_SESSION['idDonador'])){
+    header('Location: ../../index.php');
+}
 use GuzzleHttp\Psr7\Message;
 
 require './../../Infraestructura/DonadorAPI.php';
 require './../../Modelo/Donador.php';
 require './../../Modelo/Singleton/DonadorSingleton.php';
+
+require './../../Infraestructura/DonacionUrgenteAPI.php';
+require './../../Modelo//DonacionUrgente.php';
+
+$donacionAPI = new DonacionUrgenteAPI();
+
+$donaciones = $donacionAPI->obtenerDonacionesUrgentes();
+
 
 ?>
 <!DOCTYPE html>
@@ -74,73 +85,42 @@ require './../../Modelo/Singleton/DonadorSingleton.php';
                 <img src="./Images/user.png" alt="Usuario" class="rounded-circle" width="50" height="50">
                 <div class="user-menu-content">
                     <a href="./ActualizarPerfil.php">Actualizar perfil</a>
+                    <a href="./../../index.php">Cerrar sesión</a>
                 </div>
             </div>
         </div>
     </nav>
 
     <div class="container container-donations my-5">
-        <div class="row">
-            <!-- Tarjeta 1 -->
+            <!-- Tarjetas -->
+        <?php
+        $cardsEnFila = 0;
+        echo '<div class="row">';
+        foreach($donaciones as $donacion){
+            if($cardsEnFila == 3){
+                echo '</div>';
+                echo '<div class="row">';
+                $cardsEnFila = 0;
+            }
+        ?>
             <div class="col-md-4 mb-4">
                 <div class="card shadow">
                     <div class="card-body text-center">
-                        <h5 class="card-title">Juan Pérez</h5>
-                        <p class="card-text">Grupo Sanguíneo: O+</p>
+                        <h5 class="card-title"><?php echo htmlspecialchars($donacion->nombrePaciente);?></h5>
+                        <p class="card-text">Grupo Sanguíneo: <?php echo htmlspecialchars($donacion->grupoSanguineoPaciente);?></p>
                     </div>
                     <div class="card-footer text-center d-none">
-                        <p class="mb-0">Número de Cama: 101</p>
-                        <p class="mb-0">Área: Oncología</p>
+                        <p class="mb-0">Área: <?php echo htmlspecialchars($donacion->areaPaciente);?></p>
                         <a href="detalle.html?nombre=Juan%20Pérez&grupo=O%2B&cama=101&area=Oncolog%C3%ADa" class="btn btn-primary mt-2">Ver Detalles</a>
                     </div>
                 </div>
             </div>
-            <!-- Tarjeta 2 -->
-            <div class="col-md-4 mb-4">
-                <div class="card shadow">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">María González</h5>
-                        <p class="card-text">Grupo Sanguíneo: A+</p>
-                    </div>
-                    <div class="card-footer text-center d-none">
-                        <p class="mb-0">Número de Cama: 102</p>
-                        <p class="mb-0">Área: Cardiología</p>
-                        <a href="detalle.html?nombre=María%20González&grupo=A%2B&cama=102&area=Cardiolog%C3%ADa" class="btn btn-primary mt-2">Ver Detalles</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Tarjeta 3 -->
-            <div class="col-md-4 mb-4">
-                <div class="card shadow">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Luis Martínez</h5>
-                        <p class="card-text">Grupo Sanguíneo: B-</p>
-                    </div>
-                    <div class="card-footer text-center d-none">
-                        <p class="mb-0">Número de Cama: 103</p>
-                        <p class="mb-0">Área: Urgencias</p>
-                        <a href="detalle.html?nombre=Luis%20Martínez&grupo=B-&cama=103&area=Urgencias" class="btn btn-primary mt-2">Ver Detalles</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <!-- Tarjeta 4 -->
-            <div class="col-md-4 mb-4">
-                <div class="card shadow">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Juan Pérez</h5>
-                        <p class="card-text">Grupo Sanguíneo: O+</p>
-                    </div>
-                    <div class="card-footer text-center d-none">
-                        <p class="mb-0">Número de Cama: 101</p>
-                        <p class="mb-0">Área: Oncología</p>
-                        <a href="detalle.html?nombre=Juan%20Pérez&grupo=O%2B&cama=101&area=Oncolog%C3%ADa" class="btn btn-primary mt-2">Ver Detalles</a>
-                    </div>
-                </div>
-            </div>
-            
-        </div>
+        <?php 
+            $cardsEnFila = $cardsEnFila + 1;
+        }
+        echo '</div>';
+        ?>
+        
         
         
     </div>

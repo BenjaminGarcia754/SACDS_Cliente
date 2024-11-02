@@ -1,4 +1,10 @@
 <?php
+session_start();
+if(!isset($_SESSION['idDonador'])){
+    header('Location: ../../index.php');
+}
+
+use GuzzleHttp\Psr7\Message;
 require './../../Infraestructura/DonadorAPI.php';
 require './../../Modelo/Donador.php';
 require './../../Modelo/Singleton/DonadorSingleton.php';
@@ -11,13 +17,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Llamar al método de registrar donador
     $donadorAPI = new DonadorAPI();
     $emailExists = false;
-    if(isset($_POST['email'])){
+    if(isset($_POST['email']) && $_POST['email']!=null){
         $email = $_POST['email'];
         $donador->correo = $email;
         
         $emailExists = $donadorAPI->VerificarCorreo($email);
     }
-    if(isset($_POST['password'])){
+    if(isset($_POST['password']) && $_POST['password']!=null){
         $password = $_POST['password'];
         $donador->contrasena = $password;
     }
@@ -28,10 +34,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $message = "<div class='alert alert-warning'>El correo ya esta asociado a otra cuenta.</div>";
     }
     else{
-        $id = DonadorSingleton::getInstance()->getId();
+        $id = $_SESSION['idDonador'];
+        $donador->id = $id;
         $result = $donadorAPI->actualizarDonador($id, $donador);
-        
-        if($result['status']==204){
+        if($result == 204){
             $message = "<div class='alert alert-success'>Se ha actualizado el perfil.</div>";
         }
     }
@@ -71,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <div class="form-group">
                             <label for="contrasena">Nueva contraseña</label>
                             <div class="input-group">
-                                <input type="password" class="form-control" id="contrasena" name="email" placeholder="Crea una contraseña" >
+                                <input type="password" class="form-control" id="contrasena" name="password" placeholder="Crea una contraseña" >
                                 <div class="input-group-append">
                                     <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('contrasena')">
                                         <i class="fas fa-eye"></i>
@@ -85,7 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <!-- Botones centrados -->
                 <div class="text-center mt-5">
                     <button type="submit" class="btn btn-primary mr-5 w-25">Guardar</button>
-                    <a href="../../index.php" class="btn btn-secondary w-25">Regresar</a>
+                    <a href="./Menu.php" class="btn btn-secondary w-25">Regresar</a>
                 </div>
             </form>
 

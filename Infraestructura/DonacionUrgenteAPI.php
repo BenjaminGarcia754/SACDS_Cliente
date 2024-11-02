@@ -6,16 +6,19 @@ use GuzzleHttp\Exception\RequestException;
 class DonacionUrgenteAPI
 {
     private Client $client;
-    private string $baseUrl = 'https://api.chesseguro.com';
+    private string $baseUrl = 'http://localhost:5220/api/';
 
     public function __construct()
     {
-        $this->client = new Client();
+        $this->client = new Client([
+            'base_uri' => 'https://localhost:7290/api/',
+            'verify' => false, // Desactiva la verificación de SSL
+        ]);
     }
 
     public function obtenerDonacionesUrgentes(){
         try {
-            $url = $this->baseUrl . '/api/DonacionUrgente'; //Cambiar la ruta del api
+            $url = $this->baseUrl . 'DonacionUrgente/GetDonacionesUrgentes'; //Cambiar la ruta del api
             $response = $this->client->request('GET', $url);
             return json_decode($response->getBody());
         }catch (RequestException $e){
@@ -25,7 +28,7 @@ class DonacionUrgenteAPI
 
     public function obtenerDonacionUrgente(int $id){
         try {
-            $url = $this->baseUrl . '/api/DonacionUrgente/' . $id;
+            $url = $this->baseUrl . 'DonacionUrgente/' . $id;
             $response = $this->client->request('GET', $url);
             return json_decode($response->getBody());
         }catch (RequestException $e){

@@ -16,30 +16,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $donador = new Donador();
     // Llamar al método de registrar donador
     $donadorAPI = new DonadorAPI();
-    $emailExists = false;
     if(isset($_POST['email']) && $_POST['email']!=null){
         $email = $_POST['email'];
         $donador->correo = $email;
-        
-        $emailExists = $donadorAPI->VerificarCorreo($email);
     }
     if(isset($_POST['password']) && $_POST['password']!=null){
         $password = $_POST['password'];
         $donador->contrasena = $password;
     }
-    
-
-
-    if($emailExists){
-        $message = "<div class='alert alert-warning'>El correo ya esta asociado a otra cuenta.</div>";
-    }
-    else{
-        $id = $_SESSION['idDonador'];
-        $donador->id = $id;
-        $result = $donadorAPI->actualizarDonador($id, $donador);
-        if($result == 204){
-            $message = "<div class='alert alert-success'>Se ha actualizado el perfil.</div>";
-        }
+    $id = $_SESSION['idDonador'];
+    $donador->id = $id;
+    $response = $donadorAPI->actualizarDonador($id, $donador);
+    $result = $response['status'];
+    if ($result == 204) {
+        $message = "<div class='alert alert-success'>Se ha actualizado el perfil.</div>";
+    } else if ($result == 409) {
+        $message = "<div class='alert alert-warning'>El correo ya está asociado a otra cuenta.</div>";
+    } else {
+        echo var_dump($result);
+        $message = "<div class='alert alert-danger'>Ocurrió un error al actualizar el perfil.</div>";
     }
 }
 ?>

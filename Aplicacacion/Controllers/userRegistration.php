@@ -29,19 +29,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Llamar al método de registrar donador
     $donadorAPI = new DonadorAPI();
 
-    $emailExists = $donadorAPI->VerificarCorreo($email);
-    if($emailExists){
-        $message = "<div class='alert alert-warning'>El correo proporcionado ya existe.</div>";
-    }
-    else{
-        $result = $donadorAPI->registrarDonador($donador);
-        if(isset($result->id)){
-            header('Location: ./../../index.php?idNuevaCuenta='.$result->id);
-        }
-        else {
-            $message = "<div class='alert alert-danger'>Ha ocurrido un error, intentalo mas tarde.</div>";
-        }
-    }
+    $response = $donadorAPI->registrarDonador($donador);
+    $result = $response['result'];
+    $status = $response['status'];
+    if ($status == 201 && isset($result->id)) {
+        header('Location: ./../../index.php?idNuevaCuenta=' . $result->id);
+        exit();
+    } elseif ($status == 409) {
+        $message = "<div class='alert alert-warning'>El correo ya está asociado a otra cuenta. Intenta con otro correo.</div>";
+    } elseif ($status == 500) {
+        $message = "<div class='alert alert-danger'>Error interno del servidor. Inténtalo más tarde.</div>";
+    } else {
+        $message = "<div class='alert alert-danger'>Ha ocurrido un error inesperado. Código de error: $status.</div>";
+    }       
 }
 ?>
 <!DOCTYPE html>

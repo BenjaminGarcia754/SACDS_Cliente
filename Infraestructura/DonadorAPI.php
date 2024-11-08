@@ -35,13 +35,30 @@ class DonadorAPI
         }
     }
 
-    public function registrarDonador(Donador $donador){
+    public function registrarDonador(Donador $donador) {
         try {
-            $url = $this->baseUrl.'Donador/AddDonador';
-            $response = $this->client->post( $url, ['json' => $donador]);
-            return json_decode($response->getBody()->getContents());
-        }catch (RequestException $e) {
-            return $e->getMessage();
+            $url = $this->baseUrl . 'Donador/AddDonador';
+            $response = $this->client->post($url, ['json' => $donador]);
+            $status = $response->getStatusCode();
+            $result = json_decode($response->getBody()->getContents());
+
+            return [
+                'result' => $result,
+                'status' => $status,
+            ];
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $status = $e->getResponse()->getStatusCode();
+                $errorMessage = $e->getResponse()->getBody()->getContents();
+                return [
+                    'result' => json_decode($errorMessage),
+                    'status' => $status,
+                ];
+            }
+            return [
+                'result' => null,
+                'status' => 500,
+            ];
         }
     }
 
@@ -96,35 +113,24 @@ class DonadorAPI
         }
     }
     
-    public function VerificarCorreo(string $correo)
-{
-    try {
-        $url = $this->baseUrl . 'Donador/VerifyCorreoExistente?correo=' . urlencode($correo);
-
-        $response = $this->client->post($url, [
-            'verify' => false,
-        ]);
-
-        $statusCode = $response->getStatusCode();
-        $data = json_decode($response->getBody()->getContents(), true);
-        if ($statusCode === 200) {
-            return true;
-        } else {
-            return false;
-        }
-
-    } catch (RequestException $e) {
-        return false;
-    }
-}
-
+    
     public function actualizarDonador($id, Donador $donador){
         try {
-            $url = $this->baseUrl.'Donador/UpdateDonador/'.$id;
-            $response = $this->client->put( $url, ['json' => $donador]);
-            return $response->getStatusCode();
-        }catch (RequestException $e) {
-            return $e->getMessage();
+            $url = $this->baseUrl . 'Donador/UpdateDonador/' . $id;
+            $response = $this->client->put($url, ['json' => $donador]);
+            return [
+                'status' => $response->getStatusCode(),
+                'error' => null,
+            ];
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $status = $e->getResponse()->getStatusCode();
+                $errorMessage = $e->getResponse()->getBody()->getContents();
+                return [
+                    'status' => $status,
+                    'error' => $errorMessage,
+                ];
+            }
         }
     }
 

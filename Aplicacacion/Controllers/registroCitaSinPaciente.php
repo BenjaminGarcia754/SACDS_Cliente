@@ -30,20 +30,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = $ultimaCita['result'];
         $status = $ultimaCita['status'];
         // Verificar si el donador puede donar
-        if ($status == 200) {
-            $fechaUltimaCita = $ultimaCita->fechaDonacion;
-            $diasReposo = $ultimaCita->diasReposo;
-
-            // Convertir las fechas a timestamp
-            $fechaUltimaCitaTimestamp = strtotime($fechaUltimaCita);
-            $fechaCitaActualTimestamp = strtotime($fecha);
-            $fechaReposoPermitidoTimestamp = strtotime("+$diasReposo days", $fechaUltimaCitaTimestamp);
-
+        if ($status != 404) {
+            $fechaUltimaCita = new DateTime($result->$fechaDonacion);
+            $diasReposo = $result->diasReposo;
+            $fechaUltimaCita->add(new DateInterval("P{$diasReposo}D"));
+            $fechacActual = new DateTime();
             // Comparar las fechas
-            if ($fechaReposoPermitidoTimestamp > $fechaCitaActualTimestamp) {
+            if ($fechaUltimaCita > $fechacActual) {
                 // Calcular los días faltantes
-                $diasFaltantes = ceil(($fechaReposoPermitidoTimestamp - $fechaCitaActualTimestamp) / (60 * 60 * 24));
-                echo "<script>alert('Actualmente no puedes donar sangre. Necesitas reposar $diasFaltantes días para poder volver a donar.');</script>";
+                $fechaFinal = $fechacActual->diff($fechaUltimaCita);
+                $intervalo = $fechaFinal->format('%a');
+                echo "<script>alert('Actualmente no puedes donar sangre. Necesitas reposar $intervalo días para poder volver a donar.');</script>";
             } else {
                 // Crear y guardar la nueva cita
                 $citaDTO = new Cita();

@@ -1,22 +1,25 @@
 <?php
 
+require_once __DIR__ . '/../vendor/autoload.php';
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
 class TipoDonacionAPI
 {
     private Client $client;
-    private string $baseUrl = 'https://api.tipodonacion.com';
-
-    public function __construct()
-    {
-        $this->client = new Client();
+    private string $baseUrl = 'http://localhost:5220/api/TipoDonacion/';
+    public function __construct(){
+        $this->client = new Client([
+            'base_uri' => 'https://localhost:7290/api/',
+            'verify' => false, // Desactiva la verificación de SSL
+        ]);
+        
     }
 
     public function obtenerTipoDonaciones()
     {
         try {
-            $url = $this->baseUrl . '/api/tipodonacion';
+            $url = $this->baseUrl . 'GetTipoDonaciones';
             $response = $this->client->request('GET', $url);
             return json_decode($response->getBody()->getContents());
         } catch (RequestException $e) {

@@ -1,6 +1,7 @@
 <?php
 session_start();
 session_unset();
+
 use GuzzleHttp\Psr7\Message;
 
 require 'Infraestructura/DonadorAPI.php';

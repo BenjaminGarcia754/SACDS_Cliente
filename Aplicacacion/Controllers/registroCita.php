@@ -1,3 +1,85 @@
+<?php
+session_start();
+
+// Verificar si el usuario inició sesión correctamente
+if (!isset($_SESSION['idDonador'])) {
+    header('Location: ../../index.php');
+    exit;
+}
+
+// Incluir la clase Cita (ajusta la ruta según tu estructura)
+require './../../Modelo/Cita.php';
+require '../../Infraestructura/CitaAPI.php';
+$mensaje = ''; // Mensaje para mostrar al usuario
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Recibir datos del formulario
+    $idDonacion = $_SESSION['idTipoDonacion'] ?? null; // Capturar el ID de donación
+    $idUrgente = $_SESSION['idDonacionUrgente'];
+    $fecha = $_POST['fecha'] ?? null;
+
+     // Crear objeto de tipo Cita
+        $cita = new Cita();
+        $cita->idTipoDonacion = $idDonacion;
+        $cita->idDonador = $_SESSION['idDonador'];
+        $cita->idDonacionUrgente = $idUrgente;
+    // Validar datos recibidos
+    if (empty($fecha)) {
+        $mensaje = "Por favor, selecciona una fecha para la cita.";
+    } elseif (empty($idDonacion)) {
+        $mensaje = "El ID de la donación no está disponible.";
+    } else {
+        $citaAPI = new CitaAPI();
+        $idDonador = $_SESSION['idDonador'];
+        $ultimaCita = $citaAPI->obtenerCitaPorDonador($idDonador);
+        $result = $ultimaCita['result'];
+        $status = $ultimaCita['status'];
+
+        if ($status != 404) {
+            $fechaUltimaCita = new DateTime($result->$fechaDonacion);
+            $diasReposo = $result->diasReposo;
+            $fechaUltimaCita->add(new DateInterval("P{$diasReposo}D"));
+            $fechacActual = new DateTime();
+            // Comparar las fechas
+            if ($fechaUltimaCita > $fechacActual) {
+                // Calcular los días faltantes
+                $fechaFinal = $fechacActual->diff($fechaUltimaCita);
+                $intervalo = $fechaFinal->format('%a');
+                echo "<script>alert('Actualmente no puedes donar sangre. Necesitas reposar $intervalo días para poder volver a donar.');</script>";
+            } else {
+                // Crear y guardar la nueva cita
+                $cita->fechaDonacion = new DateTime($fecha);
+
+                $resultado = $citaAPI->crearCita($cita);
+                $result = $resultado['result'];
+                $status = $resultado['status'];
+                
+                if ($status == 201) {
+                    echo "<script>alert('Cita registrada .');</script>";
+                } else {
+                    echo "<script>alert('Error al registrar la cita. $status');</script>";
+                }
+            }
+        } else {            
+            $cita->fechaDonacion = new DateTime($fecha);
+
+            $resultado = $citaAPI->crearCita($cita);
+            $result = $resultado['result'];
+            $status = $resultado['status'];
+
+            if ($status == 201) {
+                echo "<script>alert('Cita  correctamente.');</script>";
+            } else {
+                echo "<script>alert('Error $status .');</script>";
+            }
+        }
+    }
+} else {
+    $mensaje = "Acceso no permitido.";
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -75,7 +157,7 @@
     <div class="container mt-5 mb-5">
         <div class="bg-white p-4 rounded shadow mx-auto" style="max-width: 600px;">
             <h2 class="text-center">Registrar Cita para Donación</h2>
-            <form action="RegistrarCita.php" method="POST">
+            <form action="registroCita.php" method="POST">
                 <div class="row mt-5">
                     
                     <div class="col-md-12">

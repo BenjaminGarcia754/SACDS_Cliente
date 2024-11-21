@@ -37,6 +37,34 @@ class CitaAPI
         }
     }
 
+    public function obtenerCitasDiaActual() : mixed {
+        try {
+            $url = $this->baseUrl . 'GetCitasCurrentDay';
+            $response = $this->client->request('GET', $url);
+            $status = $response->getStatusCode();
+            $result = json_decode($response->getBody()->getContents());
+            
+            return [
+                'result' => $result,
+                'status' => $status
+            ];
+            
+        }catch (RequestException $e){
+            if ($e->hasResponse()) {
+                $status = $e->getResponse()->getStatusCode();
+                $errorMessage = $e->getResponse()->getBody()->getContents();
+                return [
+                    'result' => json_decode($errorMessage),
+                    'status' => $status,
+                ];
+            }
+            return [
+                'result' => null,
+                'status' => 500,
+            ];
+        }
+    }
+
     public  function obtenerCitaPorDonador(int $id): mixed{
         try {
             $url = $this->baseUrl . 'GetCitasDonador/' . $id;
@@ -102,11 +130,36 @@ class CitaAPI
 
     public function editarCita(Cita $cita){
         try {
-            $url = $this->baseUrl . 'UpdateCita'; //modificar
-            $response = $this->client->put($url, ['json' => $cita]);
-            return json_decode($response->getBody());
-        }catch (RequestException $e){
-            return $e->getMessage();
+            $cit = $cita->toArray(); // Verifica que esto devuelva un arreglo asociativo con los datos de la cita
+            $url = $this->baseUrl . 'UpdateCita';
+            
+            $response = $this->client->put($url, [
+                'json' => $cit, // Envía todo el arreglo como JSON
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json'
+                ]
+            ]);
+    
+            $status = $response->getStatusCode();
+            $result = json_decode($response->getBody()->getContents());
+            return [
+                'result' => $result,
+                'status' => $status
+            ];
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $status = $e->getResponse()->getStatusCode();
+                $errorMessage = $e->getResponse()->getBody()->getContents();
+                return [
+                    'result' => json_decode($errorMessage),
+                    'status' => $status,
+                ];
+            }
+            return [
+                'result' => null,
+                'status' => 500,
+            ];
         }
     }
 

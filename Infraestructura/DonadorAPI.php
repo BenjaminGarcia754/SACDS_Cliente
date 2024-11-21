@@ -85,7 +85,7 @@ class DonadorAPI
                 $donadorTemporal->direccion = $data['direccion'];
                 $donadorTemporal->contrasena = $data['contrasena'];
                 $donadorTemporal->grupoSanguineo = $data['grupoSanguineo'];
-
+                $donadorTemporal->esDonador = $data['esDonador'];
                 return [
                     'status' => $statusCode,
                     'donador' => $donadorTemporal

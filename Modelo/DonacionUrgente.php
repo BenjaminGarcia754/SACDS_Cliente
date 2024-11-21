@@ -2,8 +2,9 @@
 
 class DonacionUrgente
 {
-    public int $Id;
-    public string $NombrePaciente;
-    public string $AreaPaciente;
-    public string $GrupoSanguineoPaciente;
+    public int $id;
+    public string $nombrePaciente;
+    public string $areaPaciente;
+    public string $grupoSanguineoPaciente;
+    public int $idTipoDonacion;
 }

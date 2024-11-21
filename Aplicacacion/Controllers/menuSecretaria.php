@@ -2,22 +2,67 @@
 session_start();
 if (!isset($_SESSION['idDonador'])) {
     header('Location: ../../index.php');
+    exit;
 }
-use GuzzleHttp\Psr7\Message;
 
+require './../../Infraestructura/CitaAPI.php';
 require './../../Infraestructura/DonadorAPI.php';
-require './../../Modelo/Donador.php';
-require './../../Modelo/Singleton/DonadorSingleton.php';
+require './../../Infraestructura/TipoDonacionAPI.php';
+require './../../Modelo/Cita.php';
 
-require './../../Infraestructura/DonacionUrgenteAPI.php';
-require './../../Modelo//DonacionUrgente.php';
+// Instancias de APIs
+$citaAPI = new CitaAPI();
+$donadorAPI = new DonadorAPI();
+$tipoDonacionAPI = new TipoDonacionAPI();
 
-$donacionAPI = new DonacionUrgenteAPI();
+// Manejar la acción de marcar como atendida
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idCita'])) {
+    $idCita = intval($_POST['idCita']);
+    
+    // Encontrar la cita original en la lista
+    $citaOriginal = null;
+    foreach ($citas as $cita) {
+        if ($cita->id === $idCita) {
+            $citaOriginal = $cita;
+            break;
+        }
+    }
 
-$response = $donacionAPI->obtenerDonacionesUrgentes();
-$donaciones = $response['result'];
+    // Validar si se encontró la cita
+    if ($citaOriginal) {
+        $resultado = $citaAPI->editarCita($citaOriginal); // Pasar el objeto completo
+        if ($resultado['success']) {
+            $mensaje = "La cita fue marcada como atendida exitosamente.";
+        } else {
+            $mensaje = "Error al marcar la cita como atendida: " . htmlspecialchars($resultado['message']);
+        }
+    } else {
+        $mensaje = "Cita no encontrada.";
+    }
+}
 
+// Obtener citas
+$response = $citaAPI->obtenerCitasDiaActual();
+$citas = $response['result'];
 
+// Mapeo para presentación
+$citasConNombres = [];
+if (sizeof($citas) > 0) {
+    foreach ($citas as $cita) {
+        $donadorResponse = $donadorAPI->obtenerDonador($cita->idDonador);
+        $tipoDonacionResponse = $tipoDonacionAPI->obtenerTipoDonacion($cita->idTipoDonacion);
+        
+        // Crear un objeto temporal con los datos originales y los nombres
+        $citasConNombres[] = [
+            'cita' => $cita,
+            'nombreDonador' => $donadorResponse['result']->nombre ?? 'Desconocido',
+            'nombreTipoDonacion' => $tipoDonacionResponse['result']->nombre ?? 'Desconocido',
+        ];
+    }
+}
+
+// Filtro de búsqueda
+$filtro = isset($_POST['filtro']) ? strtolower(trim($_POST['filtro'])) : '';
 ?>
 
 <!DOCTYPE html>
@@ -26,10 +71,9 @@ $donaciones = $response['result'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Citas - Secretaria</title>
+    <title>Citas</title>
     <link rel="stylesheet" href="./styles.css">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         .table-container {
             max-height: 400px;
@@ -40,16 +84,8 @@ $donaciones = $response['result'];
     </style>
 </head>
 
-<body style="background-image: url('./Aplicacacion/Controllers/Images/background.jpg');">
-    <!-- Header -->
-    <div style="background-image: url('./Aplicacacion/Controllers/Images/headerbg.avif');" 
-         class="header text-center py-4 bg-light rounded shadow">
-        <h1 class="display-4 font-weight-bold text-primary">SISTEMA DE ADMINISTRACIÓN DE DONADORES DE SANGRE</h1>
-        <h2 class="lead text-secondary">CENTRO DE ALTAS ESPECIALIDADES</h2>
-    </div>
-
-    <!-- Contenido principal -->
-    <div class="container my-5 bg-white p-4 rounded shadow">
+<body>
+    <div class="container my-5">
         <h2 class="text-center">Citas</h2>
 
         <?php if (isset($mensaje)): ?>
@@ -104,17 +140,6 @@ $donaciones = $response['result'];
             </table>
         </div>
     </div>
-
-    <!-- Footer -->
-    <footer class="bg-white py-3 mt-5">
-        <div class="container text-center">
-            <img src="./Aplicacacion/Controllers/Images/footerImages.png" class="img-fluid" alt="Imagen de pie de página">
-        </div>
-    </footer>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>

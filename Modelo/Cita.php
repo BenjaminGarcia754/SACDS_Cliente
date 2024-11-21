@@ -6,6 +6,7 @@ class Cita {
     public int $idDonacionUrgente;
     public DateTime $fechaDonacion;
     public int $diasReposo;
+    public bool $atendida;
 
     public function __construct(
         int $id = 0,
@@ -13,7 +14,8 @@ class Cita {
         int $idTipoDonacion = 0,
         int $idDonacionUrgente = 0,
         ?DateTime $fechaDonacion = null,
-        int $diasReposo = 0
+        int $diasReposo = 0,
+        bool $atendida
     ) {
         $this->id = $id;
         $this->idDonador = $idDonador;
@@ -21,6 +23,7 @@ class Cita {
         $this->idDonacionUrgente = $idDonacionUrgente;
         $this->fechaDonacion = $fechaDonacion ?? new DateTime();
         $this->diasReposo = $diasReposo;
+        $this->atendida = $atendida;
     }
 
     // Método para convertir el objeto a un arreglo antes de codificarlo en JSON

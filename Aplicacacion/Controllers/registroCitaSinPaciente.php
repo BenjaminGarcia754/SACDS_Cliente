@@ -5,12 +5,10 @@ if (!isset($_SESSION['idDonador'])) {
     exit();
 }
 
-// Asegúrate de incluir la clase o API que contiene el método obtenerTipoDonaciones
 require '../../Infraestructura/TipoDonacionAPI.php';
 require '../../Infraestructura/CitaAPI.php';
 require '../../Modelo/Cita.php';
 
-// Instancia la clase y obtiene los tipos de donaciones
 $tipoDonacionAPI = new TipoDonacionAPI();
 $citaAPI = new CitaAPI();
 $tiposDonaciones = $tipoDonacionAPI->obtenerTipoDonaciones();
@@ -58,9 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     echo "<script>alert('Error al registrar la cita. $status');</script>";
                 }
             }
-        } else {
-            // Si no tiene citas previas, procede normalmente
-            
+        } else {            
             $citaDTO = new Cita();
             $citaDTO->idDonador = $idDonador;
             $citaDTO->idTipoDonacion = $idTipoDonacion;
@@ -78,7 +74,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
 ?>
 
 <!DOCTYPE html>

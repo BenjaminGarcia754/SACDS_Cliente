@@ -9,11 +9,13 @@ require 'Modelo/Donador.php';
 require 'Modelo/Singleton/DonadorSingleton.php';
 
 $message = ''; // Variable para almacenar el mensaje de respuesta
-if($_SERVER["REQUEST_METHOD"] == "GET"){
-    if(isset($_GET['idNuevaCuenta'])){
+
+if ($_SERVER["REQUEST_METHOD"] == "GET") {
+    if (isset($_GET['idNuevaCuenta'])) {
         $message = "<div class='alert alert-success'>Se ha creado tu cuenta exitosamente.</div>";
     }
 }
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -32,12 +34,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Crea una instancia de Donador con los datos deserializados
         $donadorTemporal = $result['donador'];
         $_SESSION['idDonador'] = $donadorTemporal->id;
-        header("Location: Aplicacacion/Controllers/Menu.php");
+
+        // Verificar el atributo esDonador y redirigir a la página correspondiente
+        if ($donadorTemporal->esDonador) {
+            header("Location: Aplicacacion/Controllers/Menu.php");
+        } else {
+            header("Location: Aplicacacion/Controllers/MenuSecretaria.php");
+        }
         exit();  // Asegura que se detiene el procesamiento después de la redirección
     } elseif ($result['status'] === 404) {
         $message = "<div class='alert alert-danger'>Usuario o contraseña incorrectos.</div>";
     } else {
-        $message = "<div class='alert alert-warning'>Ocurrió un error: " . $result['data'] . "</div>";
+        $message = "<div class='alert alert-warning'>Ocurrió un error: " . htmlspecialchars($result['data']) . "</div>";
     }
 }
 ?>
@@ -81,7 +89,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </div>
         </form>
     </div>
-</div>
     <footer class="bg-white py-3 mt-5">
         <div class="container text-center">
             <img src="./Aplicacacion/Controllers/Images/footerImages.png" class="img-fluid" alt="Imagen 1">
@@ -101,6 +108,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-              
 </body>
 </html>

@@ -34,13 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Crea una instancia de Donador con los datos deserializados
         $donadorTemporal = $result['donador'];
         $_SESSION['idDonador'] = $donadorTemporal->id;
-
-        // Verificar el atributo esDonador y redirigir a la página correspondiente
-        if ($donadorTemporal->esDonador) {
             header("Location: Aplicacacion/Controllers/Menu.php");
-        } else {
-            header("Location: Aplicacacion/Controllers/MenuSecretaria.php");
-        }
         exit();  // Asegura que se detiene el procesamiento después de la redirección
     } elseif ($result['status'] === 404) {
         $message = "<div class='alert alert-danger'>Usuario o contraseña incorrectos.</div>";

@@ -6,12 +6,12 @@ use GuzzleHttp\Exception\RequestException;
 class DonacionUrgenteAPI
 {
     private Client $client;
-    private string $baseUrl = 'https://localhost:7290/api/DonacionUrgente/';
+    private string $baseUrl = 'https://benja.ag-dev.com.mx/SACDS/api/DonacionUrgente/';
 
     public function __construct()
     {
         $this->client = new Client([
-            'base_uri' => 'https://localhost:7290/api/DonacionUrgente/',
+            'base_uri' => 'https://benja.ag-dev.com.mx/SACDS/api/DonacionUrgente/',
             'verify' => false, // Desactiva la verificación de SSL
         ]);
     }

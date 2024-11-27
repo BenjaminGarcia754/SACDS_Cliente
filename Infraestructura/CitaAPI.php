@@ -8,10 +8,10 @@ use GuzzleHttp\Exception\RequestException;
 class CitaAPI
 {
     private Client $client;
-    private string $baseUrl = 'https://localhost:7290/api/Cita/';
+    private string $baseUrl = 'https://benja.ag-dev.com.mx/SACDS/api/Cita/';
     public function __construct(){
         $this->client = new Client([
-            'base_uri' => 'https://localhost:7290/api/Cita/',
+            'base_uri' => 'https://benja.ag-dev.com.mx/SACDS/api/Cita/',
             'verify' => false, // Desactiva la verificación de SSL
         ]);
         
@@ -92,9 +92,22 @@ class CitaAPI
             ];
         }
     }
+
+    public function toArray(Cita $cita):array{
+        return [
+            'id' => $cita->id,
+            'idDonador' => $cita->idDonador,
+            'idTipoDonacion' => $cita->idTipoDonacion,
+            'idDonacionUrgente' => $cita->idDonacionUrgente,
+            'fechaDonacion' => $cita->fechaDonacion->format(DateTime::ATOM),
+            'diasReposo' => $cita->diasReposo
+        ];
+    }
+
     public function crearCita(Cita $cita) {
         try {
-            $cit = $cita->toArray(); // Verifica que esto devuelva un arreglo asociativo con los datos de la cita
+            $cita->id = 0;
+            $cit = $this->toArray($cita);
             $url = $this->baseUrl . 'AddCita';
             
             $response = $this->client->post($url, [
@@ -130,7 +143,7 @@ class CitaAPI
 
     public function editarCita(Cita $cita){
         try {
-            $cit = $cita->toArray(); // Verifica que esto devuelva un arreglo asociativo con los datos de la cita
+            $cit = $this->toArray($cita);
             $url = $this->baseUrl . 'UpdateCita';
             
             $response = $this->client->put($url, [

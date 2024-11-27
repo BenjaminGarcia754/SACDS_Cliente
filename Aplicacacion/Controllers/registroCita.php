@@ -10,13 +10,26 @@ if (!isset($_SESSION['idDonador'])) {
 // Incluir la clase Cita (ajusta la ruta según tu estructura)
 require './../../Modelo/Cita.php';
 require '../../Infraestructura/CitaAPI.php';
+require '../../Infraestructura/TipoDonacionAPI.php';
+
 $mensaje = ''; // Mensaje para mostrar al usuario
+
+$diccionarioTiemposReposo = [
+    1 => 56,
+    2 => 7,
+    3 => 112,
+    4 => 28
+];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Recibir datos del formulario
     $idDonacion = $_SESSION['idTipoDonacion'] ?? null; // Capturar el ID de donación
     $idUrgente = $_SESSION['idDonacionUrgente'];
     $fecha = $_POST['fecha'] ?? null;
+
+    $tipodonacion = new TipoDonacionAPI();       
+    $resul = $tipodonacion->obtenerTipoDonacion($idDonacion); 
+    $estadoDonacion = $resul['result'];
 
      // Crear objeto de tipo Cita
         $cita = new Cita();
@@ -49,7 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 // Crear y guardar la nueva cita
                 $cita->fechaDonacion = new DateTime($fecha);
-
+                $cita->diasReposo = $diccionarioTiemposReposo[$idDonacion];
+                $cita->atendida = false;
                 $resultado = $citaAPI->crearCita($cita);
                 $result = $resultado['result'];
                 $status = $resultado['status'];
@@ -60,8 +74,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     echo "<script>alert('Error al registrar la cita. $status');</script>";
                 }
             }
-        } else {            
+        } else {     
+
             $cita->fechaDonacion = new DateTime($fecha);
+            $cita->diasReposo = $diccionarioTiemposReposo[$idDonacion];
+            $cita->atendida = false;
 
             $resultado = $citaAPI->crearCita($cita);
             $result = $resultado['result'];

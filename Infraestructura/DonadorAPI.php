@@ -7,10 +7,10 @@ use GuzzleHttp\Exception\RequestException;
 class DonadorAPI
 {
     private Client $client;
-    private string $baseUrl = 'http://localhost:5220/api/';
+    private string $baseUrl = 'https://benja.ag-dev.com.mx/SACDS/api/Donador/';
     public function __construct(){
         $this->client = new Client([
-            'base_uri' => 'https://localhost:7290/api/',
+            'base_uri' => 'https://benja.ag-dev.com.mx/SACDS/api/Donador',
             'verify' => false, // Desactiva la verificación de SSL
         ]);
         
@@ -18,7 +18,7 @@ class DonadorAPI
 
     public function obtenerDonadores(){
         try {
-            $url = $this->baseUrl .'/donadores';
+            $url = $this->baseUrl .'GetDonadores';
             $response = $this->client->request('GET', $url);
             return json_decode($response->getBody()->getContents());
         } catch (RequestException $e) {
@@ -27,7 +27,7 @@ class DonadorAPI
     }
     public function obtenerDonador(int $id){
         try {
-            $url = $this->baseUrl.'/donadores/'.$id;
+            $url = $this->baseUrl.'GetDonador/'.$id;
             $response = $this->client->request('GET', $url);
             return json_decode($response->getBody()->getContents());
         }catch (RequestException $e) {
@@ -37,7 +37,7 @@ class DonadorAPI
 
     public function registrarDonador(Donador $donador) {
         try {
-            $url = $this->baseUrl . 'Donador/AddDonador';
+            $url = $this->baseUrl . 'AddDonador';
             $response = $this->client->post($url, ['json' => $donador]);
             $status = $response->getStatusCode();
             $result = json_decode($response->getBody()->getContents());
@@ -65,7 +65,7 @@ class DonadorAPI
     public function IniciarSesion(Donador $donador)
     {
         try {
-            $url = $this->baseUrl . 'Donador/login';
+            $url = $this->baseUrl . 'login';
             
             $response = $this->client->post($url, [
                 'json' => (array) $donador,
@@ -116,7 +116,7 @@ class DonadorAPI
     
     public function actualizarDonador($id, Donador $donador){
         try {
-            $url = $this->baseUrl . 'Donador/UpdateDonador/' . $id;
+            $url = $this->baseUrl . 'UpdateDonador/' . $id;
             $response = $this->client->put($url, ['json' => $donador]);
             return [
                 'status' => $response->getStatusCode(),
@@ -136,7 +136,7 @@ class DonadorAPI
 
     public function eliminarDonador(int $id){
         try {
-            $url = $this->baseUrl.'/donadores/'.$id;
+            $url = $this->baseUrl.'DeleteDonador'.$id;
             $response = $this->client->delete( $url );
             return json_decode($response->getBody()->getContents());
         }catch (RequestException $e) {

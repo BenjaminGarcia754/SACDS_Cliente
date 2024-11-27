@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['idDonador'])) {
+if(!isset($_SESSION['idDonador'])){
     header('Location: ../../index.php');
 }
 use GuzzleHttp\Psr7\Message;
@@ -17,104 +17,147 @@ $donacionAPI = new DonacionUrgenteAPI();
 $response = $donacionAPI->obtenerDonacionesUrgentes();
 $donaciones = $response['result'];
 
-
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Citas - Secretaria</title>
+    <title>Menú principal</title>
     <link rel="stylesheet" href="./styles.css">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        .table-container {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            margin-top: 20px;
+        .user-menu {
+            position: relative;
+            display: inline-block;
+        }
+        .user-menu-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .user-menu-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        .user-menu-content a:hover {
+            background-color: #f1f1f1;
+        }
+        .user-menu:hover .user-menu-content {
+            display: block;
+        }
+        nav a{
+            text-decoration: none;
+            color: #ccc;
+        }
+        nav li:hover a{
+            color: #c1c1c1;
         }
     </style>
 </head>
-
-<body style="background-image: url('./Aplicacacion/Controllers/Images/background.jpg');">
-    <!-- Header -->
-    <div style="background-image: url('./Aplicacacion/Controllers/Images/headerbg.avif');" 
-         class="header text-center py-4 bg-light rounded shadow">
+<body style="background-image: url('./Images/background.jpg');">
+    <div style="background-image: url('./Images/headerbg.avif');" class="header text-center py-4 bg-light rounded shadow">
         <h1 class="display-4 font-weight-bold text-primary">SISTEMA DE ADMINISTRACIÓN DE DONADORES DE SANGRE</h1>
         <h2 class="lead text-secondary">CENTRO DE ALTAS ESPECIALIDADES</h2>
     </div>
+   <!-- Barra de navegación -->
+   <nav class="navbar navbar-expand-lg navbar-dark bg-dark w-100">
+        <div class="container-fluid justify-content-between">
+            <!-- Pestañas -->
+            <ul class="nav nav-tabs w-75 d-flex">
+                <li class="nav-item flex-fill">
+                    <a class="nav-link active" href="#">Donaciones urgentes</a>
+                </li>
+                <li class="nav-item flex-fill">
+                    <a class="nav-link" href="./registroCitaSinPaciente.php">Citas sin paciente</a>
+                </li>
+            </ul>
 
-    <!-- Contenido principal -->
-    <div class="container my-5 bg-white p-4 rounded shadow">
-        <h2 class="text-center">Citas</h2>
-
-        <?php if (isset($mensaje)): ?>
-            <div class="alert alert-info">
-                <?php echo htmlspecialchars($mensaje); ?>
+            <!-- Menú de usuario -->
+            <div class="user-menu">
+                <img src="./Images/user.png" alt="Usuario" class="rounded-circle" width="50" height="50">
+                <div class="user-menu-content">
+                    <a href="./ActualizarPerfil.php">Actualizar perfil</a>
+                    <a href="./../../index.php">Cerrar sesión</a>
+                </div>
             </div>
-        <?php endif; ?>
+        </div>
+    </nav>
 
-        <!-- Filtro -->
-        <form method="POST" class="form-group mt-4">
-            <input type="text" name="filtro" class="form-control" placeholder="Filtrar por nombre o tipo de donación..." value="<?php echo htmlspecialchars($filtro); ?>">
-            <button type="submit" class="btn btn-primary mt-2">Filtrar</button>
-        </form>
-
-        <!-- Tabla -->
-        <div class="table-container">
-            <table class="table table-bordered table-striped">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Nombre del Donador</th>
-                        <th>Tipo de Donación</th>
-                        <th>Fecha de Donación</th>
-                        <th>Días de Reposo</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($citasConNombres as $item): ?>
-                        <?php
-                        // Aplicar filtro
-                        if ($filtro &&
-                            !str_contains(strtolower($item['nombreDonador']), $filtro) &&
-                            !str_contains(strtolower($item['nombreTipoDonacion']), $filtro)
-                        ) {
-                            continue;
-                        }
-                        ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($item['nombreDonador']); ?></td>
-                            <td><?php echo htmlspecialchars($item['nombreTipoDonacion']); ?></td>
-                            <td><?php echo htmlspecialchars($item['cita']->fechaDonacion); ?></td>
-                            <td><?php echo htmlspecialchars($item['cita']->diasReposo); ?></td>
-                            <td class="text-center">
-                                <form method="POST">
-                                    <input type="hidden" name="idCita" value="<?php echo htmlspecialchars($item['cita']->id); ?>">
-                                    <button type="submit" class="btn btn-success">Marcar como atendida</button>
-                                </form>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+    <div class="container container-donations my-5">
+            <!-- Tarjetas -->
+        <?php
+        $cardsEnFila = 0;
+        echo '<div class="row">';
+        foreach($donaciones as $donacion){
+            if($cardsEnFila == 3){
+                echo '</div>';
+                echo '<div class="row">';
+                $cardsEnFila = 0;
+            }
+        ?>
+<div class="col-md-4 mb-4">
+    <div class="card shadow">
+        <div class="card-body text-center">
+            <h5 class="card-title"><?php echo htmlspecialchars($donacion->nombrePaciente); ?></h5>
+            <p class="card-text">Grupo Sanguíneo: <?php echo htmlspecialchars($donacion->grupoSanguineoPaciente); ?></p>
+        </div>
+        <div class="card-footer text-center">
+            <p class="mb-0">Área: <?php echo htmlspecialchars($donacion->areaPaciente); ?></p>
+            <!-- Formulario para enviar datos -->
+            <form action="registroCita.php" method="POST">
+                <input type="hidden" name="nombrePaciente" value="<?php echo htmlspecialchars($donacion->nombrePaciente); ?>">
+                <input type="hidden" name="grupoSanguineoPaciente" value="<?php echo htmlspecialchars($donacion->grupoSanguineoPaciente); ?>">
+                <input type="hidden" name="areaPaciente" value="<?php echo htmlspecialchars($donacion->areaPaciente); ?>">
+                <?php $_SESSION['idTipoDonacion'] = $donacion->idTipoDonacion;?>
+                <?php $_SESSION['idDonacionUrgente'] = $donacion->id;?>
+                <button type="submit" class="btn btn-primary mt-2">Ver Detalles</button>
+            </form>
         </div>
     </div>
+</div>
+        <?php 
+            $cardsEnFila = $cardsEnFila + 1;
+        }
+        echo '</div>';
+        ?>
+        
+        
+        
+    </div>
 
-    <!-- Footer -->
+
+
     <footer class="bg-white py-3 mt-5">
         <div class="container text-center">
-            <img src="./Aplicacacion/Controllers/Images/footerImages.png" class="img-fluid" alt="Imagen de pie de página">
+            <img src="./Images/footerImages.png" class="img-fluid" alt="Imagen 1">
         </div>
     </footer>
-
+    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+              
+    <script>
+        $(document).ready(function(){
+            $('.card').hover(
+                function() {
+                    $(this).find('.card-footer').removeClass('d-none');
+                    $(this).find('.card-body').hide(); // Oculta el body al hacer hover
+                }, 
+                function() {
+                    $(this).find('.card-footer').addClass('d-none');
+                    $(this).find('.card-body').show(); // Muestra el body al dejar de hacer hover
+                }
+            );
+        });
+    </script>
 </body>
-
 </html>

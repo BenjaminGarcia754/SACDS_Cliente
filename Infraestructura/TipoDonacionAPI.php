@@ -7,10 +7,10 @@ use GuzzleHttp\Exception\RequestException;
 class TipoDonacionAPI
 {
     private Client $client;
-    private string $baseUrl = 'http://localhost:5220/api/TipoDonacion/';
+    private string $baseUrl = 'https://benja.ag-dev.com.mx/SACDS/api/TipoDonacion/';
     public function __construct(){
         $this->client = new Client([
-            'base_uri' => 'https://localhost:7290/api/',
+            'base_uri' => 'https://benja.ag-dev.com.mx/SACDS/api/',
             'verify' => false, // Desactiva la verificación de SSL
         ]);
         
@@ -27,13 +27,31 @@ class TipoDonacionAPI
         }
     }
 
-    public function obtenerTipoDonacion(int $idTipoDonacion){
+    public function obtenerTipoDonacion(int $idTipoDonacion): mixed{
         try {
-            $url = $this->baseUrl . '/api/tipodonacion/' . $idTipoDonacion;
+            $url = $this->baseUrl . 'tipodonacion/' . $idTipoDonacion;
             $response = $this->client->request('GET', $url);
-            return json_decode($response->getBody()->getContents());
-        }catch (RequestException $e) {
-            return $e->getMessage();
+            $status = $response->getStatusCode();
+            $result = json_decode($response->getBody()->getContents());
+            
+            return [
+                'result' => $result,
+                'status' => $status
+            ];
+            
+        }catch (RequestException $e){
+            if ($e->hasResponse()) {
+                $status = $e->getResponse()->getStatusCode();
+                $errorMessage = $e->getResponse()->getBody()->getContents();
+                return [
+                    'result' => json_decode($errorMessage),
+                    'status' => $status,
+                ];
+            }
+            return [
+                'result' => null,
+                'status' => 500,
+            ];
         }
     }
 

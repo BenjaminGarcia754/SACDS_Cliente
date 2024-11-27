@@ -25,7 +25,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $donador->contrasena = $password;
     $donador->telefono = $phoneNumber;
     $donador->direccion = $address;
-    $donador->esDonador = true;
     // Llamar al método de registrar donador
     $donadorAPI = new DonadorAPI();
 
